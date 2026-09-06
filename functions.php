@@ -330,25 +330,25 @@ add_shortcode( 'divider', 'scapegoat_shortcode_divider' );
 
 
 function scapegoat_button( $atts, $content = null ) {
-    extract(shortcode_atts(array(
-    'link'	=> '#',
-    'target' => '',
-    'color'	=> '',
-    'size'	=> '',
-	 'form'	=> '',
-	 'font'	=> '',
-    ), $atts));
+	$a = shortcode_atts(array(
+		'link'   => '#',
+		'target' => '',
+		'color'  => '',
+		'size'   => '',
+		'form'   => '',
+		'font'   => '',
+	), $atts);
 
-	$color = ($color) ? ' '.$color. '-btn' : '';
-	$size = ($size) ? ' '.$size. '-btn' : '';
-	$form = ($form) ? ' '.$form. '-btn' : '';
-	$font = ($font) ? ' '.$font. '-btn' : '';
-	$link = esc_url_raw( $link );
-	$target = ( $target === 'blank' ) ? ' target="_blank"' : '';
+	$color = ($a['color']) ? ' '.$a['color']. '-btn' : '';
+	$size = ($a['size']) ? ' '.$a['size']. '-btn' : '';
+	$form = ($a['form']) ? ' '.$a['form']. '-btn' : '';
+	$font = ($a['font']) ? ' '.$a['font']. '-btn' : '';
+	$link = esc_url_raw( $a['link'] );
+	$target = ( $a['target'] === 'blank' ) ? ' target="_blank"' : '';
 
 	$out = '<a' . $target . ' class="standard-btn' . esc_attr( $color . $size . $form . $font ) . '" href="' . esc_url( $link ) . '"><span>' . do_shortcode( $content ) . '</span></a>';
 
-    return $out;
+	return $out;
 }
 add_shortcode('button', 'scapegoat_button');
 
@@ -366,19 +366,19 @@ function scapegoat_custom_caption($attr, $content = null) {
 	if ( $output != '' )
 		return $output;
 
-	extract(shortcode_atts(array(
-		'id'	=> '',
-		'align'	=> 'alignnone',
-		'width'	=> '',
+	$a = shortcode_atts(array(
+		'id'      => '',
+		'align'   => 'alignnone',
+		'width'   => '',
 		'caption' => ''
-	), $attr));
+	), $attr);
 
-	if ( 1 > (int) $width || empty($caption) )
+	if ( 1 > (int) $a['width'] || empty($a['caption']) )
 		return $content;
 
-	if ( $id ) $id = 'id="' . esc_attr($id) . '" ';
+	$id = $a['id'] ? 'id="' . esc_attr($a['id']) . '" ' : '';
 
-	return '<figure '. $id .'class="wp-caption '. $align .'" style="width: '. ($width) .'px">'. do_shortcode($content) .'<span class="wp-caption-text">'. $caption .'</span></figure>';
+	return '<figure '. $id .'class="wp-caption '. esc_attr($a['align']) .'" style="width: '. (int) $a['width'] .'px">'. do_shortcode($content) .'<figcaption class="wp-caption-text">'. wp_kses_post($a['caption']) .'</figcaption></figure>';
 }
 add_shortcode('wp_caption', 'scapegoat_custom_caption');
 add_shortcode('caption', 'scapegoat_custom_caption');

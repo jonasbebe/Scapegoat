@@ -29,9 +29,8 @@ function theme_options_add_page() {
 
 // Optionen-Seite erstellen
 function scapegoat_theme_options_page() {
-	global $select_options, $radio_options;
-	if ( ! isset( $_REQUEST['settings-updated'] ) )
-		$_REQUEST['settings-updated'] = false; ?>
+	$options = get_option( 'scapegoat_theme_options' );
+	$settings_updated = isset( $_REQUEST['settings-updated'] ) ? (bool) $_REQUEST['settings-updated'] : false; ?>
 
 	<div class="wrap" id="arrr">
 
@@ -39,7 +38,7 @@ function scapegoat_theme_options_page() {
 		<h2><?php _e('Scapegoat Theme-Options','scapegoat'); ?></h2> 
 
 		<!-- Message -->
-		<?php if ( false !== $_REQUEST['settings-updated'] ) : ?>
+		<?php if ( $settings_updated ) : ?>
 		<div class="updated fade">
 			<p><strong><?php _e('Settings saved!','scapegoat'); ?></strong></p>
 		</div>
@@ -48,15 +47,14 @@ function scapegoat_theme_options_page() {
 		<!-- Settings -->
 		<form method="post" action="options.php">
 			<?php settings_fields( 'scapegoat_options' ); ?>
-			<?php $options = get_option( 'scapegoat_theme_options' ); ?>
 
 			<h3><?php _e('Graphics','scapegoat'); ?></h3>
-			<p><?php printf(__('Choose an Image from your <a target="_blank" href="%s/wp-admin/upload.php">Library</a> or <a target="_blank" href="%s/wp-admin/media-new.php">upload</a> a new one.','scapegoat'), get_home_url(), get_home_url()); ?></p>
+			<p><?php printf(__('Choose an Image from your <a target="_blank" href="%s/wp-admin/upload.php">Library</a> or <a target="_blank" href="%s/wp-admin/media-new.php">upload</a> a new one.','scapegoat'), esc_url( get_home_url() ), esc_url( get_home_url() )); ?></p>
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row">Logo (Url)</th>
 					<td>
-						<input id="scapegoat_theme_options[logo]" class="regular-text" type="text" name="scapegoat_theme_options[logo]" value="<?php esc_attr_e( $options['logo'] ); ?>" />
+						<input id="scapegoat_theme_options[logo]" class="regular-text" type="text" name="scapegoat_theme_options[logo]" value="<?php echo esc_attr( $options['logo'] ?? '' ); ?>" />
 					</td>
 				</tr>
 			</table>
@@ -66,11 +64,11 @@ function scapegoat_theme_options_page() {
 					<th scope="row"><?php _e('Sidebar alignment','scapegoat'); ?></th>
 					<td>
 						<label for="sidebar-right">
-							<input id="sidebar-right" type="radio" name="scapegoat_theme_options[alignment-option]" value="sidebar-right" <?php checked( 'sidebar-right' == $options['alignment-option'] ); ?> /> <?php _e('Right','scapegoat'); ?> <span class="description"><?php _e('Default','scapegoat'); ?></span>
+							<input id="sidebar-right" type="radio" name="scapegoat_theme_options[alignment-option]" value="sidebar-right" <?php checked( 'sidebar-right' === ($options['alignment-option'] ?? '') ); ?> /> <?php _e('Right','scapegoat'); ?> <span class="description"><?php _e('Default','scapegoat'); ?></span>
 						</label>
 						<br />
 						<label for="sidebar-left">
-							<input id="sidebar-left" type="radio" name="scapegoat_theme_options[alignment-option]" value="sidebar-left" <?php checked( 'sidebar-left' == $options['alignment-option'] ); ?> /> <?php _e('Left','scapegoat'); ?>
+							<input id="sidebar-left" type="radio" name="scapegoat_theme_options[alignment-option]" value="sidebar-left" <?php checked( 'sidebar-left' === ($options['alignment-option'] ?? '') ); ?> /> <?php _e('Left','scapegoat'); ?>
 						</label>
 						
 					</td>
@@ -79,25 +77,25 @@ function scapegoat_theme_options_page() {
 					<th scope="row"><?php _e('Frontpage','scapegoat'); ?></th>
 					<td>
 						<label for="show-slider">
-							<input id="show-slider" type="radio" name="scapegoat_theme_options[header-option]" value="show-slider" <?php checked( 'show-slider' == $options['header-option'] ); ?> /> <?php _e('Slider','scapegoat'); ?>
+							<input id="show-slider" type="radio" name="scapegoat_theme_options[header-option]" value="show-slider" <?php checked( 'show-slider' === ($options['header-option'] ?? '') ); ?> /> <?php _e('Slider','scapegoat'); ?>
 						</label>
 
 						<table class="widefat slider">
 							<tr valign="top">
 								<th scope="row"><?php _e('Category (ID)','scapegoat'); ?></th>
-								<td><input id="scapegoat_theme_options[slider-cat]" class="small-text" type="text" name="scapegoat_theme_options[slider-cat]" value="<?php esc_attr_e( $options['slider-cat'] ); ?>" /> <span class="description"><?php _e('Default: All','scapegoat'); ?></span></td>
+								<td><input id="scapegoat_theme_options[slider-cat]" class="small-text" type="text" name="scapegoat_theme_options[slider-cat]" value="<?php echo esc_attr( $options['slider-cat'] ?? '' ); ?>" /> <span class="description"><?php _e('Default: All','scapegoat'); ?></span></td>
 							</tr>
 							<tr valign="top">
 								<th scope="row"><?php _e('Amount of slides','scapegoat'); ?></th>
-								<td><input id="scapegoat_theme_options[slider-num]" class="small-text" type="text" name="scapegoat_theme_options[slider-num]" value="<?php esc_attr_e( $options['slider-num'] ); ?>" /> <span class="description"><?php _e('Default: 6','scapegoat'); ?></span></td>
+								<td><input id="scapegoat_theme_options[slider-num]" class="small-text" type="text" name="scapegoat_theme_options[slider-num]" value="<?php echo esc_attr( $options['slider-num'] ?? '' ); ?>" /> <span class="description"><?php _e('Default: 6','scapegoat'); ?></span></td>
 							</tr>
 						</table>
 						<label for="show-header">
-							<input id="show-header" type="radio" name="scapegoat_theme_options[header-option]" value="show-header" <?php checked( 'show-header' == $options['header-option'] ); ?> /> <?php _e('Header','scapegoat'); ?> <span class="description"><?php _e('Default Wordpress Header Function','scapegoat'); ?></span>
+							<input id="show-header" type="radio" name="scapegoat_theme_options[header-option]" value="show-header" <?php checked( 'show-header' === ($options['header-option'] ?? '') ); ?> /> <?php _e('Header','scapegoat'); ?> <span class="description"><?php _e('Default Wordpress Header Function','scapegoat'); ?></span>
 						</label>
 						<br />
 						<label for="show-none">
-							<input id="show-none" type="radio" name="scapegoat_theme_options[header-option]" value="show-none" <?php checked( 'show-none' == $options['header-option'] ); ?> /> <?php _e('Nothing','scapegoat'); ?>
+							<input id="show-none" type="radio" name="scapegoat_theme_options[header-option]" value="show-none" <?php checked( 'show-none' === ($options['header-option'] ?? '') ); ?> /> <?php _e('Nothing','scapegoat'); ?>
 						</label>
 					</td>
 				</tr>
@@ -107,55 +105,55 @@ function scapegoat_theme_options_page() {
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row"><span class="social-icon rss"><i class="fa fa-rss"></i></span> Feed</th>
-					<td><input id="scapegoat_theme_options[rss]" class="regular-text" type="text" name="scapegoat_theme_options[rss]" value="<?php esc_attr_e( $options['rss'] ); ?>" /> <span class="description"> <?php _e('Default: http://yoururl.com/feed/','scapegoat'); ?></span></td>
+					<td><input id="scapegoat_theme_options[rss]" class="regular-text" type="text" name="scapegoat_theme_options[rss]" value="<?php echo esc_attr( $options['rss'] ?? '' ); ?>" /> <span class="description"> <?php _e('Default: http://yoururl.com/feed/','scapegoat'); ?></span></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon mail"><i class="fa fa-envelope"></i></span> Newsletter</th>
-					<td><input id="scapegoat_theme_options[mail]" class="regular-text" type="text" name="scapegoat_theme_options[mail]" value="<?php esc_attr_e( $options['mail'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[mail]" class="regular-text" type="text" name="scapegoat_theme_options[mail]" value="<?php echo esc_attr( $options['mail'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon podcast"><i class="fa fa-microphone"></i></span> Podcast</th>
-					<td><input id="scapegoat_theme_options[podcast]" class="regular-text" type="text" name="scapegoat_theme_options[podcast]" value="<?php esc_attr_e( $options['podcast'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[podcast]" class="regular-text" type="text" name="scapegoat_theme_options[podcast]" value="<?php echo esc_attr( $options['podcast'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon twitter"><i class="fa fa-twitter"></i></span> Twitter</th>
-					<td><input id="scapegoat_theme_options[twitter]" class="regular-text" type="text" name="scapegoat_theme_options[twitter]" value="<?php esc_attr_e( $options['twitter'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[twitter]" class="regular-text" type="text" name="scapegoat_theme_options[twitter]" value="<?php echo esc_attr( $options['twitter'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon facebook"><i class="fa fa-facebook"></i></span> Facebook</th>
-					<td><input id="scapegoat_theme_options[facebook]" class="regular-text" type="text" name="scapegoat_theme_options[facebook]" value="<?php esc_attr_e( $options['facebook'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[facebook]" class="regular-text" type="text" name="scapegoat_theme_options[facebook]" value="<?php echo esc_attr( $options['facebook'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon google"><i class="fa fa-google-plus"></i></span> Google +</th>
-					<td><input id="scapegoat_theme_options[google]" class="regular-text" type="text" name="scapegoat_theme_options[google]" value="<?php esc_attr_e( $options['google'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[google]" class="regular-text" type="text" name="scapegoat_theme_options[google]" value="<?php echo esc_attr( $options['google'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon youtube"><i class="fa fa-youtube-play"></i></span> Youtube</th>
-					<td><input id="scapegoat_theme_options[youtube]" class="regular-text" type="text" name="scapegoat_theme_options[youtube]" value="<?php esc_attr_e( $options['youtube'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[youtube]" class="regular-text" type="text" name="scapegoat_theme_options[youtube]" value="<?php echo esc_attr( $options['youtube'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon vimeo"><i class="fa fa-vimeo-square"></i></span> Vimeo</th>
-					<td><input id="scapegoat_theme_options[vimeo]" class="regular-text" type="text" name="scapegoat_theme_options[vimeo]" value="<?php esc_attr_e( $options['vimeo'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[vimeo]" class="regular-text" type="text" name="scapegoat_theme_options[vimeo]" value="<?php echo esc_attr( $options['vimeo'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon flickr"><i class="fa fa-flickr"></i></span> Flickr</th>
-					<td><input id="scapegoat_theme_options[flickr]" class="regular-text" type="text" name="scapegoat_theme_options[flickr]" value="<?php esc_attr_e( $options['flickr'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[flickr]" class="regular-text" type="text" name="scapegoat_theme_options[flickr]" value="<?php echo esc_attr( $options['flickr'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon github"><i class="fa fa-github"></i></span> Github</th>
-					<td><input id="scapegoat_theme_options[github]" class="regular-text" type="text" name="scapegoat_theme_options[github]" value="<?php esc_attr_e( $options['github'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[github]" class="regular-text" type="text" name="scapegoat_theme_options[github]" value="<?php echo esc_attr( $options['github'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon tumblr"><i class="fa fa-tumblr"></i></span> Tumblr</th>
-					<td><input id="scapegoat_theme_options[tumblr]" class="regular-text" type="text" name="scapegoat_theme_options[tumblr]" value="<?php esc_attr_e( $options['tumblr'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[tumblr]" class="regular-text" type="text" name="scapegoat_theme_options[tumblr]" value="<?php echo esc_attr( $options['tumblr'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon appdotnet"><i class="fa fa-adn"></i></span> APP.net</th>
-					<td><input id="scapegoat_theme_options[appdotnet]" class="regular-text" type="text" name="scapegoat_theme_options[appdotnet]" value="<?php esc_attr_e( $options['appdotnet'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[appdotnet]" class="regular-text" type="text" name="scapegoat_theme_options[appdotnet]" value="<?php echo esc_attr( $options['appdotnet'] ?? '' ); ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><span class="social-icon instagram"><i class="fa fa-instagram"></i></span> Instagram</th>
-					<td><input id="scapegoat_theme_options[instagram]" class="regular-text" type="text" name="scapegoat_theme_options[instagram]" value="<?php esc_attr_e( $options['instagram'] ); ?>" /></td>
+					<td><input id="scapegoat_theme_options[instagram]" class="regular-text" type="text" name="scapegoat_theme_options[instagram]" value="<?php echo esc_attr( $options['instagram'] ?? '' ); ?>" /></td>
 				</tr>
 			</table>
 			<!-- Submit -->
@@ -165,8 +163,33 @@ function scapegoat_theme_options_page() {
 <?php }
 
 function scapegoat_validate_options($input) {
-	// $input['copyright'] = wp_filter_nohtml_kses( $input['copyright'] );
-	return $input;
-}
+	$output = array();
 
-?>
+	// URL fields – sanitize as URLs
+	$url_fields = array( 'logo', 'rss', 'mail', 'podcast', 'twitter', 'facebook', 'google', 'youtube', 'vimeo', 'flickr', 'github', 'tumblr', 'appdotnet', 'instagram' );
+	foreach ( $url_fields as $field ) {
+		if ( isset( $input[$field] ) ) {
+			$output[$field] = esc_url_raw( trim( $input[$field] ) );
+		}
+	}
+
+	// Alignment option – whitelist
+	if ( isset( $input['alignment-option'] ) && in_array( $input['alignment-option'], array( 'sidebar-right', 'sidebar-left' ), true ) ) {
+		$output['alignment-option'] = $input['alignment-option'];
+	}
+
+	// Header option – whitelist
+	if ( isset( $input['header-option'] ) && in_array( $input['header-option'], array( 'show-slider', 'show-header', 'show-none' ), true ) ) {
+		$output['header-option'] = $input['header-option'];
+	}
+
+	// Slider category and number – integers
+	if ( isset( $input['slider-cat'] ) ) {
+		$output['slider-cat'] = intval( $input['slider-cat'] );
+	}
+	if ( isset( $input['slider-num'] ) ) {
+		$output['slider-num'] = intval( $input['slider-num'] );
+	}
+
+	return $output;
+}
