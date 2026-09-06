@@ -232,13 +232,11 @@ add_theme_support(
 function scapegoat_header_image_style() {
 	if (get_header_image()) {
 		echo '<style type="text/css">';
-		echo '.custom-header {background: url("';
-		echo header_image();
-		echo '") no-repeat scroll center center / cover transparent;}';
+		echo '.custom-header {background: url("' . esc_url( header_image() ) . '") no-repeat scroll center center / cover transparent;}';
 		echo '</style>';
 	}
 }
-add_filter('wp_head', 'scapegoat_header_image_style');
+add_action('wp_head', 'scapegoat_header_image_style');
 
 
 
@@ -543,34 +541,34 @@ function wp_pagination_navi($num_page_links = 5, $min_max_offset = 2){
 			echo '</span>';
 		
 			echo '<nav class="pagination">';
-           	if ( $current_page > 1 ) {
-				echo '<a class="pagination-previous" href="' .get_pagenum_link($current_page-1) .'" title="previous">&laquo;</a>';
-			} else {
-				echo '<span class="pagination-previous" title="previous">&laquo;</span>';
-			}
-			for ( $i = 1; $i <= $total_pages; $i++) {
-				if ( $i == $current_page ){
-					// Current page
-					echo '<a href="'.get_pagenum_link($current_page).'" class="pagination-current-page" title="page '.$i.'" >'.($current_page).'</a>';
+			if ( $current_page > 1 ) {
+				echo '<a class="pagination-previous" href="' . esc_url( get_pagenum_link($current_page-1) ) .'" title="previous">&laquo;</a>';
 				} else {
-					// Pages before and after the current page
-					if ( ($i >= ($current_page - $left_offset)) && ($i <= ($current_page + $right_offset)) ){
-						echo '<a href="'.get_pagenum_link($i).'" title="page '.$i.'" >'.$i.'</a>';
-					} elseif ( ($i <= $min_max_offset) || ($i > ($total_pages - $min_max_offset)) ) {
-						// Start and end pages with min_max_offset
-						echo '<a href="'.get_pagenum_link($i).'" title="page '.$i.'" >'.$i.'</a>';
-					} elseif ( (($i == ($min_max_offset + 1)) && ($i < ($current_page - $left_offset + 1))) ||
-								(($i == ($total_pages - $min_max_offset)) && ($i > ($current_page + $right_offset ))) ) {
-						// Dots after/before min_max_offset
-						echo '<span class="pagination-dots">...</span>';
+				echo '<span class="pagination-previous" title="previous">&laquo;</span>';
+				}
+				for ( $i = 1; $i <= $total_pages; $i++) {
+					if ( $i == $current_page ){
+						// Current page
+						echo '<a href="'. esc_url( get_pagenum_link($current_page) ) .'" class="pagination-current-page" title="page '. esc_attr( $i ) .'" >'. esc_html( $current_page ) .'</a>';
+					} else {
+						// Pages before and after the current page
+						if ( ($i >= ($current_page - $left_offset)) && ($i <= ($current_page + $right_offset)) ){
+							echo '<a href="'. esc_url( get_pagenum_link($i) ) .'" title="page '. esc_attr( $i ) .'" >'. esc_html( $i ) .'</a>';
+						} elseif ( ($i <= $min_max_offset) || ($i > ($total_pages - $min_max_offset)) ) {
+							// Start and end pages with min_max_offset
+							echo '<a href="'. esc_url( get_pagenum_link($i) ) .'" title="page '. esc_attr( $i ) .'" >'. esc_html( $i ) .'</a>';
+						} elseif ( (($i == ($min_max_offset + 1)) && ($i < ($current_page - $left_offset + 1))) ||
+									(($i == ($total_pages - $min_max_offset)) && ($i > ($current_page + $right_offset ))) ) {
+							// Dots after/before min_max_offset
+							echo '<span class="pagination-dots">...</span>';
+						}
 					}
 				}
-			}
-			if ( $current_page != $total_pages ) {
-				echo '<a class="pagination-next" href="'.get_pagenum_link($current_page+1).'" title="next">&raquo;</a>';
-			} else {
+				if ( $current_page != $total_pages ) {
+				echo '<a class="pagination-next" href="'. esc_url( get_pagenum_link($current_page+1) ) .'" title="next">&raquo;</a>';
+				} else {
 				echo '<span class="pagination-next" title="next">&raquo;</span>';
-			}
+				}
 			echo '</nav>'; //Close pagination
 		}
 	}
