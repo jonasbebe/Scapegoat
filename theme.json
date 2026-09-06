@@ -1,0 +1,245 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 2,
+
+	"settings": {
+
+		"appearanceTools": true,
+
+		"color": {
+			"palette": [
+				{
+					"slug": "primary",
+					"name": "Primary Blue",
+					"color": "#0077b3"
+				},
+				{
+					"slug": "primary-dark",
+					"name": "Primary Blue Dark",
+					"color": "#005580"
+				},
+				{
+					"slug": "accent",
+					"name": "Accent Orange",
+					"color": "#ff8000"
+				},
+				{
+					"slug": "heading",
+					"name": "Heading Text",
+					"color": "#181818"
+				},
+				{
+					"slug": "text",
+					"name": "Body Text",
+					"color": "#444444"
+				},
+				{
+					"slug": "gray-light",
+					"name": "Gray Light",
+					"color": "#bfbfbf"
+				},
+				{
+					"slug": "gray",
+					"name": "Gray",
+					"color": "#808080"
+				},
+				{
+					"slug": "gray-dark",
+					"name": "Gray Dark",
+					"color": "#404040"
+				},
+				{
+					"slug": "white",
+					"name": "White",
+					"color": "#ffffff"
+				},
+				{
+					"slug": "black",
+					"name": "Black",
+					"color": "#000000"
+				}
+			],
+			"gradients": [],
+			"duotone": []
+		},
+
+		"typography": {
+			"fluid": true,
+			"fontFamilies": [
+				{
+					"slug": "heading",
+					"name": "Heading",
+					"fontFamily": "'PoliticsHeadBold', 'Helvetica Neue', Arial, sans-serif"
+				},
+				{
+					"slug": "body",
+					"name": "Body",
+					"fontFamily": "'Open Sans', 'Helvetica Neue', Arial, sans-serif"
+				},
+				{
+					"slug": "monospace",
+					"name": "Monospace",
+					"fontFamily": "monospace, sans-serif"
+				}
+			],
+			"fontSizes": [
+				{
+					"slug": "extra-small",
+					"name": "Extra Small",
+					"size": "0.75rem",
+					"fluid": {
+						"min": "0.75rem",
+						"max": "0.85rem"
+					}
+				},
+				{
+					"slug": "small",
+					"name": "Small",
+					"size": "0.875rem",
+					"fluid": {
+						"min": "0.875rem",
+						"max": "1rem"
+					}
+				},
+				{
+					"slug": "medium",
+					"name": "Medium",
+					"size": "1rem",
+					"fluid": {
+						"min": "1rem",
+						"max": "1.125rem"
+					}
+				},
+				{
+					"slug": "large",
+					"name": "Large",
+					"size": "1.25rem",
+					"fluid": {
+						"min": "1.25rem",
+						"max": "1.5rem"
+					}
+				},
+				{
+					"slug": "extra-large",
+					"name": "Extra Large",
+					"size": "1.5rem",
+					"fluid": {
+						"min": "1.5rem",
+						"max": "1.9rem"
+					}
+				},
+				{
+					"slug": "huge",
+					"name": "Huge",
+					"size": "2.4rem",
+					"fluid": {
+						"min": "2.4rem",
+						"max": "3rem"
+					}
+				}
+			]
+		},
+
+		"layout": {
+			"contentSize": "720px",
+			"wideSize": "1440px"
+		},
+
+		"spacing": {
+			"units": [ "px", "em", "rem", "%", "vw" ]
+		}
+	},
+
+	"styles": {
+		"color": {
+			"text": "#444444",
+			"background": "#ffffff"
+		},
+		"typography": {
+			"fontFamily": "'Open Sans', 'Helvetica Neue', Arial, sans-serif",
+			"fontSize": "1rem",
+			"lineHeight": "1.5"
+		},
+		"elements": {
+			"link": {
+				"color": {
+					"text": "#0077b3"
+				},
+				":hover": {
+					"color": {
+						"text": "#005580"
+					}
+				}
+			},
+			"h1": {
+				"typography": {
+					"fontFamily": "'PoliticsHeadBold', 'Helvetica Neue', Arial, sans-serif",
+					"fontSize": "2.4rem",
+					"fontWeight": "700",
+					"lineHeight": "1.2"
+				},
+				"color": {
+					"text": "#181818"
+				}
+			},
+			"h2": {
+				"typography": {
+					"fontFamily": "'PoliticsHeadBold', 'Helvetica Neue', Arial, sans-serif",
+					"fontSize": "1.9rem",
+					"fontWeight": "700",
+					"lineHeight": "1.2"
+				},
+				"color": {
+					"text": "#181818"
+				}
+			},
+			"h3": {
+				"typography": {
+					"fontFamily": "'PoliticsHeadBold', 'Helvetica Neue', Arial, sans-serif",
+					"fontSize": "1.5rem",
+					"fontWeight": "700",
+					"lineHeight": "1.2"
+				},
+				"color": {
+					"text": "#181818"
+				}
+			},
+			"h4": {
+				"typography": {
+					"fontFamily": "'PoliticsHeadBold', 'Helvetica Neue', Arial, sans-serif",
+					"fontSize": "1.2rem",
+					"fontWeight": "700",
+					"lineHeight": "1.2"
+				},
+				"color": {
+					"text": "#181818"
+				}
+			},
+			"h5": {
+				"typography": {
+					"fontFamily": "'PoliticsHeadBold', 'Helvetica Neue', Arial, sans-serif",
+					"fontSize": "1rem",
+					"fontWeight": "700",
+					"lineHeight": "1.2"
+				},
+				"color": {
+					"text": "#181818"
+				}
+			},
+			"h6": {
+				"typography": {
+					"fontFamily": "'PoliticsHeadBold', 'Helvetica Neue', Arial, sans-serif",
+					"fontSize": "1rem",
+					"fontWeight": "700",
+					"lineHeight": "1.2"
+				},
+				"color": {
+					"text": "#181818"
+				}
+			}
+		}
+	},
+
+	"customTemplates": {},
+	"templateParts": {}
+}
