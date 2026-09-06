@@ -36,7 +36,7 @@ function scapegoat_theme_options_page() {
 	<div class="wrap" id="arrr">
 
 		<!-- Titel -->
-		<?php screen_icon(); ?><h2><?php _e('Scapegoat Theme-Options','scapegoat'); ?></h2> 
+		<h2><?php _e('Scapegoat Theme-Options','scapegoat'); ?></h2> 
 
 		<!-- Message -->
 		<?php if ( false !== $_REQUEST['settings-updated'] ) : ?>

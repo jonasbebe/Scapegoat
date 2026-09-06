@@ -80,7 +80,7 @@
 
 				<span class="post-nav-link post-nav-back">
 					<span class="post-nav-inner">
-						<a href="<?php bloginfo('url') ?>" rel="<?php _e('Back','scapegoat'); ?>">
+						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="<?php esc_attr_e('Back','scapegoat'); ?>">
 							<i class="fa fa-arrow-up"></i><span><?php _e('All Projects','goat'); ?></span>
 						</a>
 					</span>

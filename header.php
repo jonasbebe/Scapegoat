@@ -2,63 +2,63 @@
 <html class="no-js" xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
 	<?php $detect = new Mobile_Detect(); /* Mobiel Detect */ ?>	
 	<?php $options = get_option('scapegoat_theme_options'); /* load the Theme Options */ ?>
-	<?php $template_url = get_bloginfo('template_url'); /* Template Path */ ?>
-	<head profile="http://gmpg.org/xfn/11">
-		<title><?php bloginfo('name'); ?> <?php wp_title(' - ', true, 'left'); ?></title>
+	<?php $template_url = get_template_directory_uri(); /* Template Path */ ?>
+	<head>
+		<title><?php wp_get_document_title(); ?></title>
 		<meta name="author" content="Peter Amende" />
-		<meta name="description" content="<?php bloginfo('description'); ?>" />
+		<meta name="description" content="<?php bloginfo( 'description' ); ?>" />
 
-		<meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo('charset'); ?>" />
+		<meta http-equiv="Content-Type" content="<?php bloginfo( 'html_type' ); ?>; charset=<?php bloginfo( 'charset' ); ?>" />
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
 
-		<link type="text/css" rel="stylesheet" href="<?php echo $template_url; ?>/style.css" media="screen" />
-		<link type="text/css" rel="stylesheet" href="<?php echo $template_url; ?>/css/font-awesome.min.css" media="screen" />
-		<link type="text/css" rel="stylesheet" href="<?php echo $template_url; ?>/css/plugins.css" media="screen" />
-		<link type="text/css" rel="stylesheet" href="<?php echo $template_url; ?>/css/print.css" media="print" />
+		<link type="text/css" rel="stylesheet" href="<?php echo esc_url( $template_url ); ?>/style.css" media="screen" />
+		<link type="text/css" rel="stylesheet" href="<?php echo esc_url( $template_url ); ?>/css/font-awesome.min.css" media="screen" />
+		<link type="text/css" rel="stylesheet" href="<?php echo esc_url( $template_url ); ?>/css/plugins.css" media="screen" />
+		<link type="text/css" rel="stylesheet" href="<?php echo esc_url( $template_url ); ?>/css/print.css" media="print" />
 		<!--[if IE]>
-		<link type="text/css" rel="stylesheet" href="<?php echo $template_url; ?>/css/ie.css" media="screen" />
+		<link type="text/css" rel="stylesheet" href="<?php echo esc_url( $template_url ); ?>/css/ie.css" media="screen" />
 		<![endif]-->
 		<!--[if IE 7]>
-		<link type="text/css" rel="stylesheet" href="<?php echo $template_url; ?>/css/font-awesome-ie7.min.css" media="screen" />
+		<link type="text/css" rel="stylesheet" href="<?php echo esc_url( $template_url ); ?>/css/font-awesome-ie7.min.css" media="screen" />
 		<![endif]-->
 
-		<link rel="Shortcut Icon" type="image/x-icon" href="<?php echo $template_url; ?>/favicon.ico" />
+		<link rel="Shortcut Icon" type="image/x-icon" href="<?php echo esc_url( $template_url ); ?>/favicon.ico" />
 
-		<link rel="alternate" type="application/rss+xml" title="RSS" href="<?php bloginfo('rss2_url'); ?>">
-		<link rel="canonical" href="<?php bloginfo('url'); ?>" />
-		<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
-		<link rel="index" title="<?php bloginfo('description'); ?>" href="<?php bloginfo('url'); ?>" />
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="<?php echo esc_url( get_feed_link() ); ?>">
+		<link rel="canonical" href="<?php echo esc_url( home_url( '/' ) ); ?>" />
+		<link rel="pingback" href="<?php echo esc_url( get_bloginfo_rss( 'pingback_url' ) ); ?>" />
+		<link rel="index" title="<?php esc_attr( get_bloginfo( 'description' ) ); ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>" />
 
 		<?php if(is_single()) : ?>
 			<?php
 				$image_id = get_post_thumbnail_id();
 				$image_url = wp_get_attachment_image_src($image_id,'thumbnail', true);
 			?>
-			<meta property="og:title" content="<?php the_title(); ?>" />
+			<meta property="og:title" content="<?php echo esc_attr( get_the_title() ); ?>" />
 			<meta property="og:type" content="article" />
-			<meta property="og:url" content="<?php the_permalink(); ?>" />
-			<meta property="og:site_name" content="<?php bloginfo('name'); ?>" />
+			<meta property="og:url" content="<?php echo esc_url( get_permalink() ); ?>" />
+			<meta property="og:site_name" content="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
 			<meta property="og:description" content="" />
 			<?php if($image_url) : ?>
-			<meta property="og:image" content="<?php echo $image_url[0]; ?>" />
+			<meta property="og:image" content="<?php echo esc_url( $image_url[0] ); ?>" />
 			<meta property="og:image:width" content="150" />
 			<meta property="og:image:height" content="150" />
 			<?php endif; ?>
 			<meta property="twitter:card" content="summary" />
-			<meta property="twitter:title" content="<?php the_title(); ?>" />
+			<meta property="twitter:title" content="<?php echo esc_attr( get_the_title() ); ?>" />
 			<meta property="twitter:description" content="" />
 			<?php if($image_url) : ?>
-			<meta property="twitter:image" content="<?php echo $image_url[0]; ?>" />
+			<meta property="twitter:image" content="<?php echo esc_url( $image_url[0] ); ?>" />
 			<?php endif; ?>
 		<?php else : ?>
-			<meta property="og:title" content="<?php bloginfo('name'); ?>" />
+			<meta property="og:title" content="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
 			<meta property="og:type" content="website" />
-			<meta property="og:url" content="<?php bloginfo('url'); ?>" />
-			<meta property="og:site_name" content="<?php bloginfo('name'); ?>" />
-			<meta property="og:description" content="<?php bloginfo('description'); ?>" />
+			<meta property="og:url" content="<?php echo esc_url( home_url( '/' ) ); ?>" />
+			<meta property="og:site_name" content="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
+			<meta property="og:description" content="<?php echo esc_attr( get_bloginfo( 'description' ) ); ?>" />
 			<meta property="twitter:card" content="summary" />
-			<meta property="twitter:title" content="<?php the_title(); ?>" />
-			<meta property="twitter:description" content="<?php bloginfo('description'); ?>" />
+			<meta property="twitter:title" content="<?php echo esc_attr( get_the_title() ); ?>" />
+			<meta property="twitter:description" content="<?php echo esc_attr( get_bloginfo( 'description' ) ); ?>" />
 		<?php endif; ?>
 
 		<?php if($options['alignment-option'] == 'sidebar-left') : ?>
@@ -77,18 +77,18 @@
 			<header id="header-inside" class="inside">
 				<div id="header-mobile">
 					<h1 id ="logo-mobile">
-						<a title="<?php bloginfo('name'); ?>" href="<?php bloginfo('url'); ?>"><?php bloginfo('name'); ?></a>
+						<a title="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a>
 					</h1>
 					<a href="#main-nav-inside" id="menu-open"><?php _e('Navigation','scapegoat'); ?></a>
 				</div>
 				<figure id="logo">
 					<?php if($options['logo']) : ?>
-						<a title="<?php bloginfo('name'); ?>" href="<?php bloginfo('url'); ?>">
-							<img src="<?php echo $options['logo']; ?>" alt="<?php bloginfo('name'); ?>" />
+						<a title="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+							<img src="<?php echo esc_url( $options['logo'] ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
 						</a>
 					<?php else : ?>
 						<span id="logo-text">
-							<a title="<?php bloginfo('name'); ?>" href="<?php bloginfo('url'); ?>"><?php bloginfo('name'); ?></a>
+							<a title="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a>
 						</span>
 					<?php endif; ?>
 				</figure><!-- logo -->

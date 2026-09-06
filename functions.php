@@ -46,13 +46,13 @@ add_editor_style('css/editor-style.css');
 
 /* add a favicon for the admin area */
 function favicon4admin() {
-	echo '<link rel="Shortcut Icon" type="image/x-icon" href="' . get_bloginfo('template_directory') . '/favicon.ico" />';
+	echo '<link rel="Shortcut Icon" type="image/x-icon" href="' . esc_url( get_template_directory_uri() ) . '/favicon.ico" />';
 }
 add_action( 'admin_head', 'favicon4admin' );
 
 /* load "login.css" for the login */
 function custom_login() {
-	echo '<link rel="stylesheet" type="text/css" href="' . get_bloginfo('template_directory') . '/css/login.css" />';
+	echo '<link rel="stylesheet" type="text/css" href="' . esc_url( get_template_directory_uri() ) . '/css/login.css" />';
 }
 add_action('login_head', 'custom_login');
 
@@ -337,9 +337,10 @@ function scapegoat_button( $atts, $content = null ) {
 	$size = ($size) ? ' '.$size. '-btn' : '';
 	$form = ($form) ? ' '.$form. '-btn' : '';
 	$font = ($font) ? ' '.$font. '-btn' : '';
-	$target = ($target == 'blank') ? ' target="_blank"' : '';
+	$link = esc_url_raw( $link );
+	$target = ( $target === 'blank' ) ? ' target="_blank"' : '';
 
-	$out = '<a' .$target. ' class="standard-btn' .$color.$size.$form.$font. '" href="' .$link. '"><span>' .do_shortcode($content). '</span></a>';
+	$out = '<a' . $target . ' class="standard-btn' . esc_attr( $color . $size . $form . $font ) . '" href="' . esc_url( $link ) . '"><span>' . do_shortcode( $content ) . '</span></a>';
 
     return $out;
 }
@@ -608,7 +609,7 @@ function breadcrumb() {
 		echo '<nav id="breadcrumb">';
 
 		global $post;
-		$homeLink = get_bloginfo('url');
+		$homeLink = esc_url( home_url( '/' ) );
 
 		echo '<a href="' . $homeLink . '">' . $home . '</a> ' . $delimiter . ' ';
 
@@ -663,7 +664,7 @@ function breadcrumb() {
 			$parent_id  = $post->post_parent;
 			$breadcrumbs = array();
 			while ($parent_id) {
-				$page = get_page($parent_id);
+				$page = get_post( $parent_id );
 				$breadcrumbs[] = '<a href="' . get_permalink($page->ID) . '">' . get_the_title($page->ID) . '</a>';
 				$parent_id  = $page->post_parent;
 			}
@@ -713,20 +714,19 @@ public function __construct() {
 }
 
 	function widget($args, $instance) {
-		extract($args);
 		$title = apply_filters('widget_title', $instance['title']);
-		echo $before_widget;
+		echo $args['before_widget'];
 			if ($title)
-				echo $before_title . $title . $after_title;
+				echo $args['before_title'] . $title . $args['after_title'];
 			
-			if ($instance['picture'] && $instance['link']) { ?>
-				<a href="<?php echo $instance['link']; ?>">
-					<img style="width:100%;display:block;" src="<?php echo $instance['picture']; ?>">
+			<?php if ($instance['picture'] && $instance['link']) { ?>
+				<a href="<?php echo esc_url( $instance['link'] ); ?>">
+					<img style="width:100%;display:block;" src="<?php echo esc_url( $instance['picture'] ); ?>">
 				</a>
 			<?php } elseif ($instance['picture']) { ?>
-				<img style="width:100%;display:block;" src="<?php echo $instance['picture']; ?>">
+				<img style="width:100%;display:block;" src="<?php echo esc_url( $instance['picture'] ); ?>">
 			<?php }
-		echo $after_widget;
+			echo $args['after_widget'];
 	}
 
 	function update($new_instance, $old_instance) {

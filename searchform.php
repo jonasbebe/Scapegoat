@@ -1,4 +1,4 @@
-<form action="<?php bloginfo('url'); ?>" class="searchform" method="get">
+<form action="<?php echo esc_url( home_url( '/' ) ); ?>" class="searchform" method="get">
 	<input class="searchinput" type="text" placeholder="<?php echo esc_attr(__('search ...','scapegoat')); ?>" name="s">
 	<button type="submit" name="submit" class="searchsubmit">
 		<i class="fa fa-search"></i>
