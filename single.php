@@ -81,7 +81,7 @@
 				<span class="post-nav-link post-nav-back">
 					<span class="post-nav-inner">
 						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="<?php esc_attr_e('Back','scapegoat'); ?>">
-							<i class="fa fa-arrow-up"></i><span><?php _e('All Projects','goat'); ?></span>
+							<i class="fa fa-arrow-up"></i><span><?php _e('All Projects','scapegoat'); ?></span>
 						</a>
 					</span>
 				</span>

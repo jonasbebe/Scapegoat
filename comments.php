@@ -19,7 +19,7 @@ if ( post_password_required() ) {
 		<?php endif; ?>
 		<ol class="commentlist">
 			<?php
-			$comments_by_type = &get_comments(array('post_id' => get_the_ID(), 'type' => 'all', 'order' => 'asc', 'orderby' => 'comment_date_gmt'));
+			$comments_by_type = get_comments(array('post_id' => get_the_ID(), 'type' => 'all', 'order' => 'asc', 'orderby' => 'comment_date_gmt'));
 			wp_list_comments(array('callback' => 'custom_comment', 'format' => 'html5'));
 			?>
 		</ol>
@@ -48,7 +48,7 @@ if ( post_password_required() ) {
 		'title_reply'         => __('What do you think?', 'scapegoat'),
 		'title_reply_to'      => __('Leave a reply to %s', 'scapegoat'),
 		'cancel_reply_link'   => __('Cancel reply', 'scapegoat'),
-		'label_submit'        => __('Abschicken', 'piraten'),
+		'label_submit'        => __('Abschicken', 'scapegoat'),
 	));
 	?>
 <?php endif; ?>

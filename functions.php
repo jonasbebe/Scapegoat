@@ -103,46 +103,54 @@ function scapegoat_fallback_menu() {
 
 /* add css class for li with submenu */
 class My_Walker_Nav_Menu extends Walker_Nav_Menu {
-	public function display_element($el, &$children, $max_depth, $depth = 0, $args, &$output) {
+	public function display_element($el, &$children, $max_depth, $depth, $args, &$output) {
 		$id = $this->db_fields['id'];
 		if(isset($children[$el->$id])) $el->classes[] = 'has-children';
 		parent::display_element($el, $children, $max_depth, $depth, $args, $output);
 	}
-	function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
+	public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
 		global $wp_query;
-		$indent = ( $depth ) ? str_repeat( "\t", $depth ) : '';
-	
+		$indent = ( $depth ) ? str_repeat( "	", $depth ) : '';
+
 		$class_names = $value = '';
-	
+
 		$classes = empty( $item->classes ) ? array() : (array) $item->classes;
 		$classes[] = 'menu-item-' . $item->ID;
-	
+
 		$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item, $args ) );
 		$class_names = $class_names ? ' class="' . esc_attr( $class_names ) . '"' : '';
-	
+
 		$id = apply_filters( 'nav_menu_item_id', 'menu-item-'. $item->ID, $item, $args );
 		$id = $id ? ' id="' . esc_attr( $id ) . '"' : '';
-	
+
 		$output .= $indent . '<li' . $id . $value . $class_names .'>';
-	
-		$attributes  = ! empty( $item->attr_title ) ? ' title="'  		. esc_attr( $item->attr_title ) .'"' : '';
-		$attributes .= ! empty( $item->target )     ? ' target="' 		. esc_attr( $item->target     ) .'"' : '';
-		$attributes .= ! empty( $item->xfn )        ? ' accesskey="'    . esc_attr( $item->xfn        ) .'"' : '';
-		$attributes .= ! empty( $item->url )        ? ' href="'   		. esc_attr( $item->url        ) .'"' : '';
-		
+
+		$attributes  = ! empty( $item->attr_title ) ? ' title="' 			. esc_attr( $item->attr_title ) .'"' : '';
+		$attributes .= ! empty( $item->target )     ? ' target="' 			. esc_attr( $item->target     ) .'"' : '';
+		$attributes .= ! empty( $item->xfn )        ? ' accesskey="'    		. esc_attr( $item->xfn        ) .'"' : '';
+		$attributes .= ! empty( $item->url )        ? ' href="'   			. esc_attr( $item->url        ) .'"' : '';
+
 		// First applying the filters. After that, underline the accesskey in the title if present...
 		$item_title = apply_filters( 'the_title', $item->title, $item->ID );
 		if( ! empty( $item->xfn ) ) {
 			$letterpos = strpos($item_title, esc_attr( $item->xfn ) );
 			$item_title = substr($item_title, 0, $letterpos)."<u>".substr($item_title, $letterpos, 1)."</u>".substr($item_title, $letterpos+1);
 		}
-		
-		$item_output = $args->before;
+
+		$args = is_object( $args ) ? $args : new stdClass();
+		$args = (object) wp_parse_args( (array) $args, array(
+			'before'      => '',
+			'after'       => '',
+			'link_before'  => '',
+			'link_after'  => '',
+		));
+
+		$item_output  = $args->before;
 		$item_output .= '<a'. $attributes .'>';
 		$item_output .= $args->link_before . $item_title . $args->link_after;
 		$item_output .= '</a>';
 		$item_output .= $args->after;
-	
+
 		$output .= apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
 	}
 }
@@ -454,7 +462,7 @@ function custom_excerpt($excerpt_length = 55, $id = false, $echo = true) {
 	$text = '';
 	
 	if($id) {
-		$the_post = & get_post( $my_id = $id );
+		$the_post = get_post( $id );
 		$text = ($the_post->post_excerpt) ? $the_post->post_excerpt : $the_post->post_content;
 	} else {
 		global $post;
@@ -611,7 +619,7 @@ function breadcrumb() {
 		global $post;
 		$homeLink = esc_url( home_url( '/' ) );
 
-		echo '<a href="' . $homeLink . '">' . $home . '</a> ' . $delimiter . ' ';
+		echo '<a href="' . $homeLink . '">' . esc_html( $home ) . '</a> ' . $delimiter . ' ';
 
 		if ( is_category() ) {
 			global $wp_query;
@@ -619,69 +627,73 @@ function breadcrumb() {
 			$thisCat = $cat_obj->term_id;
 			$thisCat = get_category($thisCat);
 			$parentCat = get_category($thisCat->parent);
-			if ($thisCat->parent != 0) echo(get_category_parents($parentCat, TRUE, ' ' . $delimiter . ' '));
-			echo $before . single_cat_title('', false) . $after;
+			if ($thisCat->parent != 0 && !is_wp_error($parentCat)) echo(get_category_parents($parentCat, TRUE, ' ' . $delimiter . ' '));
+			echo $before . esc_html( single_cat_title('', false) ) . $after;
 
 		} elseif ( is_day() ) {
-			echo '<a href="' . get_year_link(get_the_time('Y')) . '">' . get_the_time('Y') . '</a> ' . $delimiter . ' ';
-			echo '<a href="' . get_month_link(get_the_time('Y'),get_the_time('m')) . '">' . get_the_time('F') . '</a> ' . $delimiter . ' ';
-			echo $before . get_the_time('d') . $after;
+			echo '<a href="' . esc_url( get_year_link(get_the_time('Y')) ) . '">' . esc_html( get_the_time('Y') ) . '</a> ' . $delimiter . ' ';
+			echo '<a href="' . esc_url( get_month_link(get_the_time('Y'),get_the_time('m')) ) . '">' . esc_html( get_the_time('F') ) . '</a> ' . $delimiter . ' ';
+			echo $before . esc_html( get_the_time('d') ) . $after;
 
 		} elseif ( is_month() ) {
-			echo '<a href="' . get_year_link(get_the_time('Y')) . '">' . get_the_time('Y') . '</a> ' . $delimiter . ' ';
-			echo $before . get_the_time('F') . $after;
+			echo '<a href="' . esc_url( get_year_link(get_the_time('Y')) ) . '">' . esc_html( get_the_time('Y') ) . '</a> ' . $delimiter . ' ';
+			echo $before . esc_html( get_the_time('F') ) . $after;
 
 		} elseif ( is_year() ) {
-			echo $before . get_the_time('Y') . $after;
+			echo $before . esc_html( get_the_time('Y') ) . $after;
 
 		} elseif ( is_single() && !is_attachment() ) {
 			if ( get_post_type() != 'post' ) {
 				$post_type = get_post_type_object(get_post_type());
 				$slug = $post_type->rewrite;
-			echo '<a href="' . $homeLink . '/' . $slug['slug'] . '/">' . $post_type->labels->singular_name . '</a> ' . $delimiter . ' ';
-			echo $before . get_the_title() . $after;
+				echo '<a href="' . esc_url( $homeLink . '/' . $slug['slug'] . '/' ) . '">' . esc_html( $post_type->labels->singular_name ) . '</a> ' . $delimiter . ' ';
+				echo $before . esc_html( get_the_title() ) . $after;
 			} else {
-				$cat = get_the_category(); $cat = $cat[0];
-				echo get_category_parents($cat, TRUE, ' ' . $delimiter . ' ');
-				echo $before . get_the_title() . $after;
+				$cats = get_the_category();
+				$cat = !empty($cats) ? $cats[0] : null;
+				if ( $cat && !is_wp_error($cat) ) echo get_category_parents($cat, TRUE, ' ' . $delimiter . ' ');
+				echo $before . esc_html( get_the_title() ) . $after;
 			}
 
 		} elseif ( !is_single() && !is_page() && get_post_type() != 'post' && !is_404() ) {
 			$post_type = get_post_type_object(get_post_type());
-			echo $before . $post_type->labels->singular_name . $after;
+			echo $before . esc_html( $post_type->labels->singular_name ) . $after;
 
 		} elseif ( is_attachment() ) {
 			$parent = get_post($post->post_parent);
-			$cat = get_the_category($parent->ID); $cat = $cat[0];
-			echo get_category_parents($cat, TRUE, ' ' . $delimiter . ' ');
-			echo '<a href="' . get_permalink($parent) . '">' . $parent->post_title . '</a> ' . $delimiter . ' ';
-			echo $before . get_the_title() . $after;
+			$cat_array = get_the_category($parent->ID);
+			if ( !empty($cat_array) && !is_wp_error($cat_array) ) {
+				$cat = $cat_array[0];
+				echo get_category_parents($cat, TRUE, ' ' . $delimiter . ' ');
+			}
+			echo '<a href="' . esc_url( get_permalink($parent) ) . '">' . esc_html( $parent->post_title ) . '</a> ' . $delimiter . ' ';
+			echo $before . esc_html( get_the_title() ) . $after;
 
 		} elseif ( is_page() && !$post->post_parent ) {
-			echo $before . get_the_title() . $after;
+			echo $before . esc_html( get_the_title() ) . $after;
 
 		} elseif ( is_page() && $post->post_parent ) {
 			$parent_id  = $post->post_parent;
 			$breadcrumbs = array();
 			while ($parent_id) {
 				$page = get_post( $parent_id );
-				$breadcrumbs[] = '<a href="' . get_permalink($page->ID) . '">' . get_the_title($page->ID) . '</a>';
+				$breadcrumbs[] = '<a href="' . esc_url( get_permalink($page->ID) ) . '">' . esc_html( get_the_title($page->ID) ) . '</a>';
 				$parent_id  = $page->post_parent;
 			}
 			$breadcrumbs = array_reverse($breadcrumbs);
 			foreach ($breadcrumbs as $crumb) echo $crumb . ' ' . $delimiter . ' ';
-			echo $before . get_the_title() . $after;
+			echo $before . esc_html( get_the_title() ) . $after;
 
 		} elseif ( is_search() ) {
-			echo $before . __('Search','scapegoat') . ' "' . get_search_query() . '"' . $after;
+			echo $before . __('Search','scapegoat') . ' &ldquo;' . esc_html( get_search_query() ) . '&rdquo;' . $after;
 
 		} elseif ( is_tag() ) {
-			echo $before . __('Tag','scapegoat') . ' "' . single_tag_title('', false) . '"' . $after;
+			echo $before . __('Tag','scapegoat') . ' &ldquo;' . esc_html( single_tag_title('', false) ) . '&rdquo;' . $after;
 
 		} elseif ( is_author() ) {
 			global $author;
 			$userdata = get_userdata($author);
-			echo $before . __('Author','scapegoat') . ' "' . $userdata->display_name . '"' . $after;
+			echo $before . __('Author','scapegoat') . ' &ldquo;' . esc_html( $userdata->display_name ) . '&rdquo;' . $after;
 
 		} elseif ( is_404() ) {
 			echo $before . __('404','scapegoat') . $after;
@@ -689,7 +701,7 @@ function breadcrumb() {
 
 		if ( get_query_var('paged') ) {
 			if ( is_category() || is_day() || is_month() || is_year() || is_search() || is_tag() || is_author() ) echo ' (';
-				echo __('Page','scapegoat') . ' ' . get_query_var('paged');
+			echo __('Page','scapegoat') . ' ' . get_query_var('paged');
 			if ( is_category() || is_day() || is_month() || is_year() || is_search() || is_tag() || is_author() ) echo ')';
 		}
 
@@ -718,22 +730,22 @@ public function __construct() {
 		echo $args['before_widget'];
 			if ($title)
 				echo $args['before_title'] . $title . $args['after_title'];
-			
-			<?php if ($instance['picture'] && $instance['link']) { ?>
-				<a href="<?php echo esc_url( $instance['link'] ); ?>">
-					<img style="width:100%;display:block;" src="<?php echo esc_url( $instance['picture'] ); ?>">
-				</a>
-			<?php } elseif ($instance['picture']) { ?>
+
+		if ($instance['picture'] && $instance['link']) { ?>
+			<a href="<?php echo esc_url( $instance['link'] ); ?>">
 				<img style="width:100%;display:block;" src="<?php echo esc_url( $instance['picture'] ); ?>">
-			<?php }
-			echo $args['after_widget'];
+			</a>
+		<?php } elseif ($instance['picture']) { ?>
+			<img style="width:100%;display:block;" src="<?php echo esc_url( $instance['picture'] ); ?>">
+		<?php }
+		echo $args['after_widget'];
 	}
 
 	function update($new_instance, $old_instance) {
 		$instance = $old_instance;
-		$instance['title'] = strip_tags($new_instance['title']);
-		$instance['picture'] = strip_tags($new_instance['picture']);
-		$instance['link'] = strip_tags($new_instance['link']);
+		$instance['title'] = sanitize_text_field( $new_instance['title'] );
+		$instance['picture'] = esc_url_raw( $new_instance['picture'] );
+		$instance['link'] = esc_url_raw( $new_instance['link'] );
 		return $instance;
 	}
 
@@ -766,10 +778,9 @@ function custom_comment($comment, $args, $depth) {
 	if ($comment->comment_parent < 1) {
 		$comment_counter ++;
 	}
-	$GLOBALS['comment'] = $comment;
 	?>
 	<li <?php comment_class(); ?> id="li-comment-<?php comment_ID() ?>">
-		<?php if ($comment->comment_parent < 1) {echo '<span class="comment-number">' . $comment_counter . '</span>';} ?>
+		<?php if ($comment->comment_parent < 1) {echo '<span class="comment-number">' . (int) $comment_counter . '</span>';} ?>
 		<div id="comment-<?php comment_ID(); ?>" class="comment-body">
 			<div class="comment-info">
 				<div class="comment-author vcard">
@@ -780,16 +791,16 @@ function custom_comment($comment, $args, $depth) {
 				</div>
 				<div class="comment-meta commentmetadata">
 					<a href="<?php echo esc_url( get_comment_link( $comment->comment_ID ) ) ?>">
-						<?php printf(__('%1$s'), get_comment_date('d.m.Y')) ?>
+						<?php echo esc_html( get_comment_date('d.m.Y') ); ?>
 					</a>
 					<span class="reply">
 						<?php comment_reply_link(array_merge( $args, array('depth' => $depth, 'max_depth' => $args['max_depth']))) ?>
 					</span>
 					<?php /* edit_comment_link(__('(Edit)'),'  ','') */ ?>
-				</div>				
+				</div>
 			</div><!--comment-info-->
 			<div class="comment-text">
-				<?php if ($comment->comment_approved == '0') : ?>
+				<?php if ($comment->comment_approved === '0') : ?>
 					<span class="unlock"><?php _e('Your comment will be public soon.','scapegoat') ?></span>
 					<br />
 				<?php endif; ?>
