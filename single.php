@@ -7,7 +7,7 @@
 					<?php the_post_thumbnail('featured'); ?>
 					<?php if(get_post(get_post_thumbnail_id())->post_excerpt) : ?>
 						<span class="meta-thumbnail-caption">
-							<?php echo get_post(get_post_thumbnail_id())->post_excerpt; ?>
+							<?php echo esc_html(get_post(get_post_thumbnail_id())->post_excerpt); ?>
 						</span>
 					<?php endif; ?>
 				</figure><!-- slide-image -->
@@ -80,8 +80,8 @@
 
 				<span class="post-nav-link post-nav-back">
 					<span class="post-nav-inner">
-						<a href="<?php bloginfo('url') ?>" rel="<?php _e('Back','scapegoat'); ?>">
-							<i class="fa fa-arrow-up"></i><span><?php _e('All Projects','goat'); ?></span>
+						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="<?php esc_attr_e('Back','scapegoat'); ?>">
+							<i class="fa fa-arrow-up"></i><span><?php _e('All Projects','scapegoat'); ?></span>
 						</a>
 					</span>
 				</span>

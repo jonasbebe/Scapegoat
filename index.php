@@ -43,7 +43,7 @@
 								</a>
 								<?php if(get_post(get_post_thumbnail_id())->post_excerpt) : ?>
 									<span class="post-image-caption">
-										<?php echo get_post(get_post_thumbnail_id())->post_excerpt; ?>
+										<?php echo esc_html(get_post(get_post_thumbnail_id())->post_excerpt); ?>
 									</span>
 								<?php endif; ?>
 							</figure>
@@ -54,7 +54,7 @@
 								</a>
 								<?php if(get_post(get_post_thumbnail_id())->post_excerpt) : ?>
 									<span class="post-image-caption">
-										<?php echo get_post(get_post_thumbnail_id())->post_excerpt; ?>
+										<?php echo esc_html(get_post(get_post_thumbnail_id())->post_excerpt); ?>
 									</span>
 								<?php endif; ?>
 							</figure>

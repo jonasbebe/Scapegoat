@@ -39,20 +39,20 @@ function scapegoat_enqueue_scripts() {
 }
 
 /* localization */
-load_theme_textdomain('scapegoat', TEMPLATEPATH .'/languages');
+load_theme_textdomain('scapegoat', get_template_directory() .'/languages');
 
 /* add "editor-style.css" for the admin-interface */
 add_editor_style('css/editor-style.css');
 
 /* add a favicon for the admin area */
 function favicon4admin() {
-	echo '<link rel="Shortcut Icon" type="image/x-icon" href="' . get_bloginfo('template_directory') . '/favicon.ico" />';
+	echo '<link rel="Shortcut Icon" type="image/x-icon" href="' . esc_url( get_template_directory_uri() ) . '/favicon.ico" />';
 }
 add_action( 'admin_head', 'favicon4admin' );
 
 /* load "login.css" for the login */
 function custom_login() {
-	echo '<link rel="stylesheet" type="text/css" href="' . get_bloginfo('template_directory') . '/css/login.css" />';
+	echo '<link rel="stylesheet" type="text/css" href="' . esc_url( get_template_directory_uri() ) . '/css/login.css" />';
 }
 add_action('login_head', 'custom_login');
 
@@ -103,46 +103,54 @@ function scapegoat_fallback_menu() {
 
 /* add css class for li with submenu */
 class My_Walker_Nav_Menu extends Walker_Nav_Menu {
-	public function display_element($el, &$children, $max_depth, $depth = 0, $args, &$output) {
+	public function display_element($el, &$children, $max_depth, $depth, $args, &$output) {
 		$id = $this->db_fields['id'];
 		if(isset($children[$el->$id])) $el->classes[] = 'has-children';
 		parent::display_element($el, $children, $max_depth, $depth, $args, $output);
 	}
-	function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
+	public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
 		global $wp_query;
-		$indent = ( $depth ) ? str_repeat( "\t", $depth ) : '';
-	
+		$indent = ( $depth ) ? str_repeat( "	", $depth ) : '';
+
 		$class_names = $value = '';
-	
+
 		$classes = empty( $item->classes ) ? array() : (array) $item->classes;
 		$classes[] = 'menu-item-' . $item->ID;
-	
+
 		$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item, $args ) );
 		$class_names = $class_names ? ' class="' . esc_attr( $class_names ) . '"' : '';
-	
+
 		$id = apply_filters( 'nav_menu_item_id', 'menu-item-'. $item->ID, $item, $args );
 		$id = $id ? ' id="' . esc_attr( $id ) . '"' : '';
-	
+
 		$output .= $indent . '<li' . $id . $value . $class_names .'>';
-	
-		$attributes  = ! empty( $item->attr_title ) ? ' title="'  		. esc_attr( $item->attr_title ) .'"' : '';
-		$attributes .= ! empty( $item->target )     ? ' target="' 		. esc_attr( $item->target     ) .'"' : '';
-		$attributes .= ! empty( $item->xfn )        ? ' accesskey="'    . esc_attr( $item->xfn        ) .'"' : '';
-		$attributes .= ! empty( $item->url )        ? ' href="'   		. esc_attr( $item->url        ) .'"' : '';
-		
+
+		$attributes  = ! empty( $item->attr_title ) ? ' title="' 			. esc_attr( $item->attr_title ) .'"' : '';
+		$attributes .= ! empty( $item->target )     ? ' target="' 			. esc_attr( $item->target     ) .'"' : '';
+		$attributes .= ! empty( $item->xfn )        ? ' accesskey="'    		. esc_attr( $item->xfn        ) .'"' : '';
+		$attributes .= ! empty( $item->url )        ? ' href="'   			. esc_attr( $item->url        ) .'"' : '';
+
 		// First applying the filters. After that, underline the accesskey in the title if present...
 		$item_title = apply_filters( 'the_title', $item->title, $item->ID );
 		if( ! empty( $item->xfn ) ) {
 			$letterpos = strpos($item_title, esc_attr( $item->xfn ) );
 			$item_title = substr($item_title, 0, $letterpos)."<u>".substr($item_title, $letterpos, 1)."</u>".substr($item_title, $letterpos+1);
 		}
-		
-		$item_output = $args->before;
+
+		$args = is_object( $args ) ? $args : new stdClass();
+		$args = (object) wp_parse_args( (array) $args, array(
+			'before'      => '',
+			'after'       => '',
+			'link_before'  => '',
+			'link_after'  => '',
+		));
+
+		$item_output  = $args->before;
 		$item_output .= '<a'. $attributes .'>';
 		$item_output .= $args->link_before . $item_title . $args->link_after;
 		$item_output .= '</a>';
 		$item_output .= $args->after;
-	
+
 		$output .= apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
 	}
 }
@@ -224,13 +232,11 @@ add_theme_support(
 function scapegoat_header_image_style() {
 	if (get_header_image()) {
 		echo '<style type="text/css">';
-		echo '.custom-header {background: url("';
-		echo header_image();
-		echo '") no-repeat scroll center center / cover transparent;}';
+		echo '.custom-header {background: url("' . esc_url( header_image() ) . '") no-repeat scroll center center / cover transparent;}';
 		echo '</style>';
 	}
 }
-add_filter('wp_head', 'scapegoat_header_image_style');
+add_action('wp_head', 'scapegoat_header_image_style');
 
 
 
@@ -324,24 +330,25 @@ add_shortcode( 'divider', 'scapegoat_shortcode_divider' );
 
 
 function scapegoat_button( $atts, $content = null ) {
-    extract(shortcode_atts(array(
-    'link'	=> '#',
-    'target' => '',
-    'color'	=> '',
-    'size'	=> '',
-	 'form'	=> '',
-	 'font'	=> '',
-    ), $atts));
+	$a = shortcode_atts(array(
+		'link'   => '#',
+		'target' => '',
+		'color'  => '',
+		'size'   => '',
+		'form'   => '',
+		'font'   => '',
+	), $atts);
 
-	$color = ($color) ? ' '.$color. '-btn' : '';
-	$size = ($size) ? ' '.$size. '-btn' : '';
-	$form = ($form) ? ' '.$form. '-btn' : '';
-	$font = ($font) ? ' '.$font. '-btn' : '';
-	$target = ($target == 'blank') ? ' target="_blank"' : '';
+	$color = ($a['color']) ? ' '.$a['color']. '-btn' : '';
+	$size = ($a['size']) ? ' '.$a['size']. '-btn' : '';
+	$form = ($a['form']) ? ' '.$a['form']. '-btn' : '';
+	$font = ($a['font']) ? ' '.$a['font']. '-btn' : '';
+	$link = esc_url_raw( $a['link'] );
+	$target = ( $a['target'] === 'blank' ) ? ' target="_blank"' : '';
 
-	$out = '<a' .$target. ' class="standard-btn' .$color.$size.$form.$font. '" href="' .$link. '"><span>' .do_shortcode($content). '</span></a>';
+	$out = '<a' . $target . ' class="standard-btn' . esc_attr( $color . $size . $form . $font ) . '" href="' . esc_url( $link ) . '"><span>' . do_shortcode( $content ) . '</span></a>';
 
-    return $out;
+	return $out;
 }
 add_shortcode('button', 'scapegoat_button');
 
@@ -359,19 +366,19 @@ function scapegoat_custom_caption($attr, $content = null) {
 	if ( $output != '' )
 		return $output;
 
-	extract(shortcode_atts(array(
-		'id'	=> '',
-		'align'	=> 'alignnone',
-		'width'	=> '',
+	$a = shortcode_atts(array(
+		'id'      => '',
+		'align'   => 'alignnone',
+		'width'   => '',
 		'caption' => ''
-	), $attr));
+	), $attr);
 
-	if ( 1 > (int) $width || empty($caption) )
+	if ( 1 > (int) $a['width'] || empty($a['caption']) )
 		return $content;
 
-	if ( $id ) $id = 'id="' . esc_attr($id) . '" ';
+	$id = $a['id'] ? 'id="' . esc_attr($a['id']) . '" ' : '';
 
-	return '<figure '. $id .'class="wp-caption '. $align .'" style="width: '. ($width) .'px">'. do_shortcode($content) .'<span class="wp-caption-text">'. $caption .'</span></figure>';
+	return '<figure '. $id .'class="wp-caption '. esc_attr($a['align']) .'" style="width: '. (int) $a['width'] .'px">'. do_shortcode($content) .'<figcaption class="wp-caption-text">'. wp_kses_post($a['caption']) .'</figcaption></figure>';
 }
 add_shortcode('wp_caption', 'scapegoat_custom_caption');
 add_shortcode('caption', 'scapegoat_custom_caption');
@@ -453,7 +460,7 @@ function custom_excerpt($excerpt_length = 55, $id = false, $echo = true) {
 	$text = '';
 	
 	if($id) {
-		$the_post = & get_post( $my_id = $id );
+		$the_post = get_post( $id );
 		$text = ($the_post->post_excerpt) ? $the_post->post_excerpt : $the_post->post_content;
 	} else {
 		global $post;
@@ -527,41 +534,41 @@ function wp_pagination_navi($num_page_links = 5, $min_max_offset = 2){
 		// More than one page -> render pagination
 		if ( $total_pages > 1 ) {
 			echo '<span class="pagination-info">';
-			echo _e('Page ','scapegoat');
-			echo $current_page; 
-			echo _e(' of ','scapegoat');
+			echo __('Page ','scapegoat');
+			echo $current_page;
+			echo __(' of ','scapegoat');
 			echo $total_pages;
 			echo '</span>';
 		
 			echo '<nav class="pagination">';
-           	if ( $current_page > 1 ) {
-				echo '<a class="pagination-previous" href="' .get_pagenum_link($current_page-1) .'" title="previous">&laquo;</a>';
-			} else {
-				echo '<span class="pagination-previous" title="previous">&laquo;</span>';
-			}
-			for ( $i = 1; $i <= $total_pages; $i++) {
-				if ( $i == $current_page ){
-					// Current page
-					echo '<a href="'.get_pagenum_link($current_page).'" class="pagination-current-page" title="page '.$i.'" >'.($current_page).'</a>';
+			if ( $current_page > 1 ) {
+				echo '<a class="pagination-previous" href="' . esc_url( get_pagenum_link($current_page-1) ) .'" title="previous">&laquo;</a>';
 				} else {
-					// Pages before and after the current page
-					if ( ($i >= ($current_page - $left_offset)) && ($i <= ($current_page + $right_offset)) ){
-						echo '<a href="'.get_pagenum_link($i).'" title="page '.$i.'" >'.$i.'</a>';
-					} elseif ( ($i <= $min_max_offset) || ($i > ($total_pages - $min_max_offset)) ) {
-						// Start and end pages with min_max_offset
-						echo '<a href="'.get_pagenum_link($i).'" title="page '.$i.'" >'.$i.'</a>';
-					} elseif ( (($i == ($min_max_offset + 1)) && ($i < ($current_page - $left_offset + 1))) ||
-								(($i == ($total_pages - $min_max_offset)) && ($i > ($current_page + $right_offset ))) ) {
-						// Dots after/before min_max_offset
-						echo '<span class="pagination-dots">...</span>';
+				echo '<span class="pagination-previous" title="previous">&laquo;</span>';
+				}
+				for ( $i = 1; $i <= $total_pages; $i++) {
+					if ( $i == $current_page ){
+						// Current page
+						echo '<a href="'. esc_url( get_pagenum_link($current_page) ) .'" class="pagination-current-page" title="page '. esc_attr( $i ) .'" >'. esc_html( $current_page ) .'</a>';
+					} else {
+						// Pages before and after the current page
+						if ( ($i >= ($current_page - $left_offset)) && ($i <= ($current_page + $right_offset)) ){
+							echo '<a href="'. esc_url( get_pagenum_link($i) ) .'" title="page '. esc_attr( $i ) .'" >'. esc_html( $i ) .'</a>';
+						} elseif ( ($i <= $min_max_offset) || ($i > ($total_pages - $min_max_offset)) ) {
+							// Start and end pages with min_max_offset
+							echo '<a href="'. esc_url( get_pagenum_link($i) ) .'" title="page '. esc_attr( $i ) .'" >'. esc_html( $i ) .'</a>';
+						} elseif ( (($i == ($min_max_offset + 1)) && ($i < ($current_page - $left_offset + 1))) ||
+									(($i == ($total_pages - $min_max_offset)) && ($i > ($current_page + $right_offset ))) ) {
+							// Dots after/before min_max_offset
+							echo '<span class="pagination-dots">...</span>';
+						}
 					}
 				}
-			}
-			if ( $current_page != $total_pages ) {
-				echo '<a class="pagination-next" href="'.get_pagenum_link($current_page+1).'" title="next">&raquo;</a>';
-			} else {
+				if ( $current_page != $total_pages ) {
+				echo '<a class="pagination-next" href="'. esc_url( get_pagenum_link($current_page+1) ) .'" title="next">&raquo;</a>';
+				} else {
 				echo '<span class="pagination-next" title="next">&raquo;</span>';
-			}
+				}
 			echo '</nav>'; //Close pagination
 		}
 	}
@@ -608,9 +615,9 @@ function breadcrumb() {
 		echo '<nav id="breadcrumb">';
 
 		global $post;
-		$homeLink = get_bloginfo('url');
+		$homeLink = esc_url( home_url( '/' ) );
 
-		echo '<a href="' . $homeLink . '">' . $home . '</a> ' . $delimiter . ' ';
+		echo '<a href="' . $homeLink . '">' . esc_html( $home ) . '</a> ' . $delimiter . ' ';
 
 		if ( is_category() ) {
 			global $wp_query;
@@ -618,69 +625,73 @@ function breadcrumb() {
 			$thisCat = $cat_obj->term_id;
 			$thisCat = get_category($thisCat);
 			$parentCat = get_category($thisCat->parent);
-			if ($thisCat->parent != 0) echo(get_category_parents($parentCat, TRUE, ' ' . $delimiter . ' '));
-			echo $before . single_cat_title('', false) . $after;
+			if ($thisCat->parent != 0 && !is_wp_error($parentCat)) echo(get_category_parents($parentCat, TRUE, ' ' . $delimiter . ' '));
+			echo $before . esc_html( single_cat_title('', false) ) . $after;
 
 		} elseif ( is_day() ) {
-			echo '<a href="' . get_year_link(get_the_time('Y')) . '">' . get_the_time('Y') . '</a> ' . $delimiter . ' ';
-			echo '<a href="' . get_month_link(get_the_time('Y'),get_the_time('m')) . '">' . get_the_time('F') . '</a> ' . $delimiter . ' ';
-			echo $before . get_the_time('d') . $after;
+			echo '<a href="' . esc_url( get_year_link(get_the_time('Y')) ) . '">' . esc_html( get_the_time('Y') ) . '</a> ' . $delimiter . ' ';
+			echo '<a href="' . esc_url( get_month_link(get_the_time('Y'),get_the_time('m')) ) . '">' . esc_html( get_the_time('F') ) . '</a> ' . $delimiter . ' ';
+			echo $before . esc_html( get_the_time('d') ) . $after;
 
 		} elseif ( is_month() ) {
-			echo '<a href="' . get_year_link(get_the_time('Y')) . '">' . get_the_time('Y') . '</a> ' . $delimiter . ' ';
-			echo $before . get_the_time('F') . $after;
+			echo '<a href="' . esc_url( get_year_link(get_the_time('Y')) ) . '">' . esc_html( get_the_time('Y') ) . '</a> ' . $delimiter . ' ';
+			echo $before . esc_html( get_the_time('F') ) . $after;
 
 		} elseif ( is_year() ) {
-			echo $before . get_the_time('Y') . $after;
+			echo $before . esc_html( get_the_time('Y') ) . $after;
 
 		} elseif ( is_single() && !is_attachment() ) {
 			if ( get_post_type() != 'post' ) {
 				$post_type = get_post_type_object(get_post_type());
 				$slug = $post_type->rewrite;
-			echo '<a href="' . $homeLink . '/' . $slug['slug'] . '/">' . $post_type->labels->singular_name . '</a> ' . $delimiter . ' ';
-			echo $before . get_the_title() . $after;
+				echo '<a href="' . esc_url( $homeLink . '/' . $slug['slug'] . '/' ) . '">' . esc_html( $post_type->labels->singular_name ) . '</a> ' . $delimiter . ' ';
+				echo $before . esc_html( get_the_title() ) . $after;
 			} else {
-				$cat = get_the_category(); $cat = $cat[0];
-				echo get_category_parents($cat, TRUE, ' ' . $delimiter . ' ');
-				echo $before . get_the_title() . $after;
+				$cats = get_the_category();
+				$cat = !empty($cats) ? $cats[0] : null;
+				if ( $cat && !is_wp_error($cat) ) echo get_category_parents($cat, TRUE, ' ' . $delimiter . ' ');
+				echo $before . esc_html( get_the_title() ) . $after;
 			}
 
 		} elseif ( !is_single() && !is_page() && get_post_type() != 'post' && !is_404() ) {
 			$post_type = get_post_type_object(get_post_type());
-			echo $before . $post_type->labels->singular_name . $after;
+			echo $before . esc_html( $post_type->labels->singular_name ) . $after;
 
 		} elseif ( is_attachment() ) {
 			$parent = get_post($post->post_parent);
-			$cat = get_the_category($parent->ID); $cat = $cat[0];
-			echo get_category_parents($cat, TRUE, ' ' . $delimiter . ' ');
-			echo '<a href="' . get_permalink($parent) . '">' . $parent->post_title . '</a> ' . $delimiter . ' ';
-			echo $before . get_the_title() . $after;
+			$cat_array = get_the_category($parent->ID);
+			if ( !empty($cat_array) && !is_wp_error($cat_array) ) {
+				$cat = $cat_array[0];
+				echo get_category_parents($cat, TRUE, ' ' . $delimiter . ' ');
+			}
+			echo '<a href="' . esc_url( get_permalink($parent) ) . '">' . esc_html( $parent->post_title ) . '</a> ' . $delimiter . ' ';
+			echo $before . esc_html( get_the_title() ) . $after;
 
 		} elseif ( is_page() && !$post->post_parent ) {
-			echo $before . get_the_title() . $after;
+			echo $before . esc_html( get_the_title() ) . $after;
 
 		} elseif ( is_page() && $post->post_parent ) {
 			$parent_id  = $post->post_parent;
 			$breadcrumbs = array();
 			while ($parent_id) {
-				$page = get_page($parent_id);
-				$breadcrumbs[] = '<a href="' . get_permalink($page->ID) . '">' . get_the_title($page->ID) . '</a>';
+				$page = get_post( $parent_id );
+				$breadcrumbs[] = '<a href="' . esc_url( get_permalink($page->ID) ) . '">' . esc_html( get_the_title($page->ID) ) . '</a>';
 				$parent_id  = $page->post_parent;
 			}
 			$breadcrumbs = array_reverse($breadcrumbs);
 			foreach ($breadcrumbs as $crumb) echo $crumb . ' ' . $delimiter . ' ';
-			echo $before . get_the_title() . $after;
+			echo $before . esc_html( get_the_title() ) . $after;
 
 		} elseif ( is_search() ) {
-			echo $before . __('Search','scapegoat') . ' "' . get_search_query() . '"' . $after;
+			echo $before . __('Search','scapegoat') . ' &ldquo;' . esc_html( get_search_query() ) . '&rdquo;' . $after;
 
 		} elseif ( is_tag() ) {
-			echo $before . __('Tag','scapegoat') . ' "' . single_tag_title('', false) . '"' . $after;
+			echo $before . __('Tag','scapegoat') . ' &ldquo;' . esc_html( single_tag_title('', false) ) . '&rdquo;' . $after;
 
 		} elseif ( is_author() ) {
 			global $author;
 			$userdata = get_userdata($author);
-			echo $before . __('Author','scapegoat') . ' "' . $userdata->display_name . '"' . $after;
+			echo $before . __('Author','scapegoat') . ' &ldquo;' . esc_html( $userdata->display_name ) . '&rdquo;' . $after;
 
 		} elseif ( is_404() ) {
 			echo $before . __('404','scapegoat') . $after;
@@ -688,7 +699,7 @@ function breadcrumb() {
 
 		if ( get_query_var('paged') ) {
 			if ( is_category() || is_day() || is_month() || is_year() || is_search() || is_tag() || is_author() ) echo ' (';
-				echo __('Page','scapegoat') . ' ' . get_query_var('paged');
+			echo __('Page','scapegoat') . ' ' . get_query_var('paged');
 			if ( is_category() || is_day() || is_month() || is_year() || is_search() || is_tag() || is_author() ) echo ')';
 		}
 
@@ -702,38 +713,37 @@ function breadcrumb() {
 /*-----------------------------------------------------------------------------------*/
 class banner extends WP_Widget {
 
-	function banner() {
-		parent::__construct(
-			'banner',
-			__('Banner','scapegoat'),
-			array(
-				'description' => __('A simple Widget for Images.','scapegoat')
-			)
-		);
-	}
+public function __construct() {
+	parent::__construct(
+		'banner',
+		__('Banner','scapegoat'),
+		array(
+			'description' => __('A simple Widget for Images.','scapegoat')
+		)
+	);
+}
 
 	function widget($args, $instance) {
-		extract($args);
 		$title = apply_filters('widget_title', $instance['title']);
-		echo $before_widget;
+		echo $args['before_widget'];
 			if ($title)
-				echo $before_title . $title . $after_title;
-			
-			if ($instance['picture'] && $instance['link']) { ?>
-				<a href="<?php echo $instance['link']; ?>">
-					<img style="width:100%;display:block;" src="<?php echo $instance['picture']; ?>">
-				</a>
-			<?php } elseif ($instance['picture']) { ?>
-				<img style="width:100%;display:block;" src="<?php echo $instance['picture']; ?>">
-			<?php }
-		echo $after_widget;
+				echo $args['before_title'] . $title . $args['after_title'];
+
+		if ($instance['picture'] && $instance['link']) { ?>
+			<a href="<?php echo esc_url( $instance['link'] ); ?>">
+				<img style="width:100%;display:block;" src="<?php echo esc_url( $instance['picture'] ); ?>">
+			</a>
+		<?php } elseif ($instance['picture']) { ?>
+			<img style="width:100%;display:block;" src="<?php echo esc_url( $instance['picture'] ); ?>">
+		<?php }
+		echo $args['after_widget'];
 	}
 
 	function update($new_instance, $old_instance) {
 		$instance = $old_instance;
-		$instance['title'] = strip_tags($new_instance['title']);
-		$instance['picture'] = strip_tags($new_instance['picture']);
-		$instance['link'] = strip_tags($new_instance['link']);
+		$instance['title'] = sanitize_text_field( $new_instance['title'] );
+		$instance['picture'] = esc_url_raw( $new_instance['picture'] );
+		$instance['link'] = esc_url_raw( $new_instance['link'] );
 		return $instance;
 	}
 
@@ -743,12 +753,12 @@ class banner extends WP_Widget {
 			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:','scapegoat'); ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
 		</p>
-		<?php $picture = attribute_escape($instance['picture']); ?>
+		<?php $picture = esc_attr($instance['picture']); ?>
 		<p>
 			<label for="<?php echo $this->get_field_id('picture'); ?>"><?php _e('Image url:','scapegoat') ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id('picture'); ?>" name="<?php echo $this->get_field_name('picture'); ?>" type="text" value="<?php echo $picture ?>" />
 		</p>
-		<?php $link = attribute_escape($instance['link']); ?>
+		<?php $link = esc_attr($instance['link']); ?>
 		<p>
 			<label for="<?php echo $this->get_field_id('link'); ?>"><?php _e('Link url:','scapegoat') ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name('link'); ?>" type="text" value="<?php echo $link ?>" />
@@ -756,7 +766,7 @@ class banner extends WP_Widget {
 		<?php 
 	}
 }
-add_action('widgets_init', create_function('', 'return register_widget("banner");'));
+add_action('widgets_init', function() { return register_widget('banner'); });
 
 /*-----------------------------------------------------------------------------------*/
 /* Custom Comments
@@ -766,10 +776,9 @@ function custom_comment($comment, $args, $depth) {
 	if ($comment->comment_parent < 1) {
 		$comment_counter ++;
 	}
-	$GLOBALS['comment'] = $comment;
 	?>
 	<li <?php comment_class(); ?> id="li-comment-<?php comment_ID() ?>">
-		<?php if ($comment->comment_parent < 1) {echo '<span class="comment-number">' . $comment_counter . '</span>';} ?>
+		<?php if ($comment->comment_parent < 1) {echo '<span class="comment-number">' . (int) $comment_counter . '</span>';} ?>
 		<div id="comment-<?php comment_ID(); ?>" class="comment-body">
 			<div class="comment-info">
 				<div class="comment-author vcard">
@@ -780,16 +789,16 @@ function custom_comment($comment, $args, $depth) {
 				</div>
 				<div class="comment-meta commentmetadata">
 					<a href="<?php echo esc_url( get_comment_link( $comment->comment_ID ) ) ?>">
-						<?php printf(__('%1$s'), get_comment_date('d.m.Y')) ?>
+						<?php echo esc_html( get_comment_date('d.m.Y') ); ?>
 					</a>
 					<span class="reply">
 						<?php comment_reply_link(array_merge( $args, array('depth' => $depth, 'max_depth' => $args['max_depth']))) ?>
 					</span>
 					<?php /* edit_comment_link(__('(Edit)'),'  ','') */ ?>
-				</div>				
+				</div>
 			</div><!--comment-info-->
 			<div class="comment-text">
-				<?php if ($comment->comment_approved == '0') : ?>
+				<?php if ($comment->comment_approved === '0') : ?>
 					<span class="unlock"><?php _e('Your comment will be public soon.','scapegoat') ?></span>
 					<br />
 				<?php endif; ?>

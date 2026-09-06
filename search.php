@@ -46,7 +46,7 @@
 					
 					<?php if(get_post_meta($post->ID, 'video', true) && $options['custom-excerpt']) : ?>
 						<figure class="post-video">
-							<?php echo get_post_meta($post->ID, 'video', true); ?>
+							<?php echo wp_kses_post(get_post_meta($post->ID, 'video', true)); ?>
 						</figure>
 					<?php elseif(has_post_thumbnail()) : ?>
 						<?php if(!$detect->isMobile() || $detect->isTablet()) : ?>
@@ -56,7 +56,7 @@
 								</a>
 								<?php if(get_post(get_post_thumbnail_id())->post_excerpt) : ?>
 									<span class="post-image-caption">
-										<?php echo get_post(get_post_thumbnail_id())->post_excerpt; ?>
+										<?php echo esc_html(get_post(get_post_thumbnail_id())->post_excerpt); ?>
 									</span>
 								<?php endif; ?>
 							</figure>
@@ -67,7 +67,7 @@
 								</a>
 								<?php if(get_post(get_post_thumbnail_id())->post_excerpt) : ?>
 									<span class="post-image-caption">
-										<?php echo get_post(get_post_thumbnail_id())->post_excerpt; ?>
+										<?php echo esc_html(get_post(get_post_thumbnail_id())->post_excerpt); ?>
 									</span>
 								<?php endif; ?>
 							</figure>
