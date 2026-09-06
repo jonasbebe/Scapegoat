@@ -39,7 +39,7 @@ function scapegoat_enqueue_scripts() {
 }
 
 /* localization */
-load_theme_textdomain('scapegoat', TEMPLATEPATH .'/languages');
+load_theme_textdomain('scapegoat', get_template_directory() .'/languages');
 
 /* add "editor-style.css" for the admin-interface */
 add_editor_style('css/editor-style.css');
@@ -527,9 +527,9 @@ function wp_pagination_navi($num_page_links = 5, $min_max_offset = 2){
 		// More than one page -> render pagination
 		if ( $total_pages > 1 ) {
 			echo '<span class="pagination-info">';
-			echo _e('Page ','scapegoat');
-			echo $current_page; 
-			echo _e(' of ','scapegoat');
+			echo __('Page ','scapegoat');
+			echo $current_page;
+			echo __(' of ','scapegoat');
 			echo $total_pages;
 			echo '</span>';
 		
@@ -702,15 +702,15 @@ function breadcrumb() {
 /*-----------------------------------------------------------------------------------*/
 class banner extends WP_Widget {
 
-	function banner() {
-		parent::__construct(
-			'banner',
-			__('Banner','scapegoat'),
-			array(
-				'description' => __('A simple Widget for Images.','scapegoat')
-			)
-		);
-	}
+public function __construct() {
+	parent::__construct(
+		'banner',
+		__('Banner','scapegoat'),
+		array(
+			'description' => __('A simple Widget for Images.','scapegoat')
+		)
+	);
+}
 
 	function widget($args, $instance) {
 		extract($args);
@@ -743,12 +743,12 @@ class banner extends WP_Widget {
 			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:','scapegoat'); ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
 		</p>
-		<?php $picture = attribute_escape($instance['picture']); ?>
+		<?php $picture = esc_attr($instance['picture']); ?>
 		<p>
 			<label for="<?php echo $this->get_field_id('picture'); ?>"><?php _e('Image url:','scapegoat') ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id('picture'); ?>" name="<?php echo $this->get_field_name('picture'); ?>" type="text" value="<?php echo $picture ?>" />
 		</p>
-		<?php $link = attribute_escape($instance['link']); ?>
+		<?php $link = esc_attr($instance['link']); ?>
 		<p>
 			<label for="<?php echo $this->get_field_id('link'); ?>"><?php _e('Link url:','scapegoat') ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name('link'); ?>" type="text" value="<?php echo $link ?>" />
@@ -756,7 +756,7 @@ class banner extends WP_Widget {
 		<?php 
 	}
 }
-add_action('widgets_init', create_function('', 'return register_widget("banner");'));
+add_action('widgets_init', function() { return register_widget('banner'); });
 
 /*-----------------------------------------------------------------------------------*/
 /* Custom Comments
